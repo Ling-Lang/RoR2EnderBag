@@ -24,7 +24,7 @@ namespace EnderBag
             // First registering your AssetBundle into the ResourcesAPI with a modPrefix that'll also be used for your prefab and icon paths
             // note that the string parameter of this GetManifestResourceStream call will change depending on
             // your namespace and file name
-            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("EnderBag.enderbag")) 
+            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("EnderBag.enderbag"))
             {
                 var bundle = AssetBundle.LoadFromStream(stream);
 
@@ -55,7 +55,7 @@ namespace EnderBag
                     ItemTag.Utility
                 }
 
-            }; 
+            };
             var itemDisplayRules = new ItemDisplayRule[0]; // keep this null if you don't want the item to show up on the survivor 3d model. You can also have multiple rules !
             var enderBag = new R2API.CustomItem(EnderBagItem, itemDisplayRules);
             ItemAPI.Add(enderBag); // ItemAPI sends back the ItemIndex of your item
@@ -64,14 +64,14 @@ namespace EnderBag
         private static void AddLanguageTokens()
         {
             //The Name should be self explanatory
-            LanguageAPI.Add("ENDERBAG_NAME", 
+            LanguageAPI.Add("ENDERBAG_NAME",
                 "Ender Bag");
             //The Pickup is the short text that appears when you first pick this up. This text should be short and to the point, nuimbers are generally ommited.
             LanguageAPI.Add("ENDERBAG_PICKUP",
                 "Chance to share picked-up items with teammates.");
             //The Description is where you put the actual numbers and give an advanced description.
             LanguageAPI.Add("ENDERBAG_DESC",
-                $"Picking up an item has a <style=cIsUtility>10%</style> <style=cStack>(+10% per stack)</style> chance to send it to allies holding an <style=cIsUtility>Ender Bag</style>. \nItems are shared between players that possess this item. \nStored items may return to you at random after multiple pickups if no allies are eligible.\nTotal Chance: <style=cIsUtility>{EnderBag.ItemShareChance}%</style>");
+                $"Picking up an item has a <style=cIsUtility>15%</style> <style=cStack>(+10% per stack)</style> chance to send it to allies holding an <style=cIsUtility>Ender Bag</style>. \nItems are shared between players that possess this item. \nStored items may return to you at random after multiple pickups if no allies are eligible.\nTotal Chance: <style=cIsUtility>{EnderBag.ItemShareChance}%</style>");
 
             //The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("ENDERBAG_LORE",

@@ -26,24 +26,20 @@ namespace EnderBag
         }
         private static void OnGrantItem(On.RoR2.GenericPickupController.orig_AttemptGrant orig, GenericPickupController self, CharacterBody body)
         {
-            Debug.LogError("ENDERBAG: AttemptGrant called");
+            Debug.Log("ENDERBAG: AttemptGrant called");
             var item = PickupCatalog.GetPickupDef(self.pickupIndex);
-            Debug.LogError("ENDERBAG: 1AttemptGrant called");
+            Debug.Log("ENDERBAG: 1AttemptGrant called");
             var itemDef = ItemCatalog.GetItemDef(item.itemIndex);
-            Debug.LogError("ENDERBAG: 2AttemptGrant called");
+            Debug.Log("ENDERBAG: 2AttemptGrant called");
             var randomizedPlayerDict = new Dictionary<CharacterMaster, PickupDef>();
 
             var master = body?.master ?? body.inventory?.GetComponent<CharacterMaster>();
 
-            //if(NetworkServer.active)
-            //{
-                if (NetworkServer.active
-                    && IsValidItemPickup(self.pickupIndex)
-                    && IsValidPickupObject(self, body))
+            if (IsValidItemPickup(self.pickupIndex) && IsValidPickupObject(self, body))
             {
-                    Debug.LogError("ENDERBAG: 3AttemptGrant called");
+                Debug.LogError("ENDERBAG: 3AttemptGrant called");
                 //int itemCount = body.inventory.GetItemCount(Assets.EnderBagItem);
-                
+
                 EnderBag.ItemShareChance = 15f + (10f * body.inventory.GetItemCount(Assets.EnderBagItem) - 10);
                 Debug.Log($"ENDERBAG: ItemShareChance: {EnderBag.ItemShareChance}");
                 Debug.Log($"ENDERBAG: AttemptGrant called for {itemDef.name} with pickupIndex {self.pickupIndex} and itemCount {body.inventory.GetItemCount(Assets.EnderBagItem)}");
@@ -51,7 +47,22 @@ namespace EnderBag
                 bool otherPlayerHasEnderBag = PlayerCharacterMasterController.instances
                     .Select(p => p.master)
                     .Any(player => player != master && player.inventory.GetItemCount(Assets.EnderBagItem) > 0);
+                Debug.Log(NetworkServer.active);
+                if (NetworkHandler.IsMultiplayerLobby())
+                {
+                    // Run chance to duplicate item
+                    var randomValue = UnityEngine.Random.Range(0f, 100f);
+                    Debug.Log($"Random Value: {randomValue}, ItemShareChance: {EnderBag.ItemShareChance}");
+                    if (randomValue > EnderBag.ItemShareChance)
+                    {
+                        Debug.Log("Skipping item sharing due to chance logic.");
+                        orig(self, body);
+                        return;
+                    }
+                    Debug.Log($"Giving item {itemDef.name} to ");
+                    HandleGiveItem(master, item);
 
+                }
                 if (!otherPlayerHasEnderBag)
                 {
                     Debug.Log("No other player has the EnderBag item. Skipping sharing logic.");
@@ -74,7 +85,6 @@ namespace EnderBag
                         NetworkHandler.SendItemPickupMessage(player.playerCharacterMasterController.networkUser.connectionToClient.connectionId, item.pickupIndex);
                         continue;
                     }
-                    EnderBag.UpdateEnderBagDescription();
                     float randomValue = UnityEngine.Random.Range(0f, 100f);
                     Debug.Log($"Random Value: {randomValue}, ItemShareChance: {EnderBag.ItemShareChance}");
 
@@ -89,8 +99,8 @@ namespace EnderBag
             }
 
             orig(self, body);
-            ChatHandler.SendRichPickupMessage(master, item);
-            HandleRichMessageUnlockAndNotification(master, item.pickupIndex);
+            //ChatHandler.SendRichPickupMessage(master, item);
+            //HandleRichMessageUnlockAndNotification(master, item.pickupIndex);
         }
 
 
@@ -100,7 +110,7 @@ namespace EnderBag
             if (pickupDef != null && pickupDef.itemIndex != ItemIndex.None)
             {
                 var itemDef = ItemCatalog.GetItemDef(pickupDef.itemIndex);
-                if(itemDef == Assets.EnderBagItem)
+                if (itemDef == Assets.EnderBagItem)
                     return false;
                 switch (itemDef.tier)
                 {
@@ -186,7 +196,8 @@ namespace EnderBag
 
             if (connectionId != null)
             {
-                NetworkHandler.SendItemPickupMessage(connectionId.Value, pickupDef.pickupIndex);
+                ;
+                //NetworkHandler.SendItemPickupMessage(connectionId.Value, pickupDef.pickupIndex);
             }
         }
 

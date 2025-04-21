@@ -7,6 +7,10 @@ namespace EnderBag.Networking
 {
     public static class NetworkHandler
     {
+        public static bool IsMultiplayerLobby()
+        {
+            return RoR2Application.isInSinglePlayer;
+        }
         public static void RegisterHandlers()
         {
             var client = NetworkManager.singleton?.client;
